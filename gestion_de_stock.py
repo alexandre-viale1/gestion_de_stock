@@ -1,8 +1,8 @@
-import mysql.connector
 from tkinter import *
 from tkinter import messagebox
+import pymysql
 
-mydb = mysql.connector.connect(
+mydb = pymysql.connect(
   host="localhost",
   user="root",
   password="0000",
@@ -14,7 +14,6 @@ root.title("Gestion de stock")
 
 listbox = Listbox(root, width=50)
 listbox.pack()
-
 
 def afficher_produits():
   listbox.delete(0, END)
@@ -35,7 +34,6 @@ quantite_produit.pack()
 id_categorie_produit = Entry(root, width=30)
 id_categorie_produit.pack()
 
-
 def ajouter_produit():
   nom = nom_produit.get()
   description = description_produit.get()
@@ -52,10 +50,8 @@ def ajouter_produit():
   mydb.commit()
   afficher_produits()
 
-
 ajouter_bouton = Button(root, text="Ajouter un produit", command=ajouter_produit)
 ajouter_bouton.pack()
-
 
 def supprimer_produit():
   selection = listbox.curselection()
@@ -64,4 +60,16 @@ def supprimer_produit():
     return
   produit = listbox.get(selection[0])
   id_produit = produit[0]
-  mycursor = mydb
+  mycursor = mydb.cursor()
+  mycursor.execute("DELETE FROM produit WHERE id_produit=%s", (id_produit,))
+  mydb.commit()
+  afficher_produits()
+
+supprimer_bouton = Button(root, text="Supprimer le produit sélectionné", command=supprimer_produit)
+supprimer_bouton.pack()
+
+afficher_produits()
+
+root.mainloop()
+
+mydb.close()
